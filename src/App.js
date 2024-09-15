@@ -1,25 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Calendar from './Calender.tsx';
+import "./App.css"
 
-function App() {
+const App = () => {
+  const [showFromCalender, setShowFromCalender] = useState(false)
+  const [showToCalender, setShowToCalender] = useState(false)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <button className='one-way-button' onClick={() => setShowFromCalender(prev => !prev)}> From</button>
+      <button className='one-way-button' onClick={() => setShowToCalender(prev => !prev)}> To</button>
+      {showFromCalender && <Calendar />}
+      {showToCalender && <Calendar showOneWayButton={true} />}
     </div>
   );
-}
+};
 
 export default App;
