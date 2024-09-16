@@ -1,16 +1,12 @@
-import React, { useState } from 'react';
-import Calendar from './Calender.tsx';
-import "./App.css"
+import React from 'react';
+import "./app.scss"
+import SearchComponent from './SearchComponent.tsx';
 
 const App = () => {
-  const [showFromCalender, setShowFromCalender] = useState(false)
-  const [showToCalender, setShowToCalender] = useState(false)
+
   return (
     <div>
-      <button className='one-way-button' onClick={() => setShowFromCalender(prev => !prev)}> From</button>
-      <button className='one-way-button' onClick={() => setShowToCalender(prev => !prev)}> To</button>
-      {showFromCalender && <Calendar />}
-      {showToCalender && <Calendar showOneWayButton={true} />}
+      <SearchComponent />
     </div>
   );
 };

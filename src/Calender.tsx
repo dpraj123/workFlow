@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 const getDaysInMonth = (month: number, year: number): number => {
   return new Date(year, month + 1, 0).getDate();
 };
@@ -8,20 +7,42 @@ const getFirstDayOfMonth = (month: number, year: number): number => {
   const day = new Date(year, month, 1).getDay();
   return day === 0 ? 6 : day - 1;
 };
-
+const formatSelectedDate = (date: Date | null): string => {
+  if (date) {
+    const day = date.getDate();
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  } else {
+    return "";
+  }
+};
 interface CalendarProps {
   showOneWayButton: boolean;
+  startDate: Date | null;
+  endDate: Date | null;
+  setStartDate: React.Dispatch<React.SetStateAction<Date | null>>;
+  setEndDate: React.Dispatch<React.SetStateAction<Date | null>>;
+  setSearchf: React.Dispatch<React.SetStateAction<string>>;
+  setShowToCalender: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Calendar: React.FC<CalendarProps> = ({ showOneWayButton = false }) => {
+const FlightSearchDateCalendar: React.FC<CalendarProps> = ({
+  showOneWayButton,
+  startDate,
+  endDate,
+  setStartDate,
+  setEndDate,
+  setSearchf,
+  setShowToCalender,
+}) => {
   const today = new Date();
-
   const [currentMonth, setCurrentMonth] = useState<number>(today.getMonth());
   const [currentYear, setCurrentYear] = useState<number>(today.getFullYear());
-
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-
+  const handleOneWayClick = () => {
+    setSearchf("One-way");
+    setShowToCalender(false);
+  };
   const daysOfWeek: string[] = [
     "Mon",
     "Tue",
@@ -57,6 +78,7 @@ const Calendar: React.FC<CalendarProps> = ({ showOneWayButton = false }) => {
     } else if (startDate && !endDate) {
       if (selectedDate > startDate) {
         setEndDate(selectedDate);
+        setSearchf(`${formatSelectedDate(selectedDate)}`);
       } else {
         setStartDate(selectedDate);
       }
@@ -76,19 +98,20 @@ const Calendar: React.FC<CalendarProps> = ({ showOneWayButton = false }) => {
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
+      const currentDate = new Date(year, month, day);
       const isPastDate =
         year < today.getFullYear() ||
         (year === today.getFullYear() && month < today.getMonth()) ||
         (year === today.getFullYear() &&
           month === today.getMonth() &&
           day < todayDate);
-
+      const isBeforeStartDate = startDate && currentDate < startDate;
       const selectedDate = new Date(year, month, day);
 
       const isSelectedStart =
         startDate && selectedDate.toDateString() === startDate.toDateString();
       const isSelectedEnd =
-        endDate && selectedDate.toDateString() === endDate?.toDateString();
+        endDate && selectedDate.toDateString() === endDate.toDateString();
       const isInRange =
         startDate &&
         endDate &&
@@ -106,7 +129,9 @@ const Calendar: React.FC<CalendarProps> = ({ showOneWayButton = false }) => {
           key={day}
           className={`calendar-day ${isSelectedStart ? "selected" : ""} ${
             isSelectedEnd ? "selected" : ""
-          } ${isInRange ? "in-range" : ""} ${isPastDate ? "disabled" : ""}`}
+          } ${isInRange ? "in-range" : ""} ${
+            isPastDate || isBeforeStartDate ? "disabled" : ""
+          }`}
           onClick={handleClick}
         >
           {day}
@@ -115,13 +140,6 @@ const Calendar: React.FC<CalendarProps> = ({ showOneWayButton = false }) => {
     }
 
     return days;
-  };
-
-  const formatSelectedDate = (date: Date): string => {
-    const day = date.getDate();
-    const month = date.toLocaleString("default", { month: "short" });
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
   };
 
   const renderCalendar = (
@@ -170,7 +188,6 @@ const Calendar: React.FC<CalendarProps> = ({ showOneWayButton = false }) => {
       </div>
     </div>
   );
-
   return (
     <>
       <div className="calendar-main-container">
@@ -188,15 +205,13 @@ const Calendar: React.FC<CalendarProps> = ({ showOneWayButton = false }) => {
           ]}
         </div>
         {showOneWayButton && (
-          <button className="one-way-button">One Way</button>
+          <button className="one-way-button" onClick={handleOneWayClick}>
+            One Way
+          </button>
         )}
-      </div>
-      <div className="selected-dates" style={{ textAlign: "center" }}>
-        {startDate && <h3>Start Date: {formatSelectedDate(startDate)}</h3>}
-        {endDate && <h3>End Date: {formatSelectedDate(endDate)}</h3>}
       </div>
     </>
   );
 };
 
-export default Calendar;
+export default FlightSearchDateCalendar;
