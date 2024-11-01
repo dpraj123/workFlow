@@ -1,14 +1,20 @@
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { Home } from './components/Home';
+import { About } from './components/About';
+import Contact from './components/Contact';
 import "./app.scss"
-import SearchComponent from './SearchComponent.tsx';
 
-const App = () => {
-
+function App() {
   return (
-    <div>
-      <SearchComponent />
+    <div className="App">
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
     </div>
   );
-};
+}
 
 export default App;
