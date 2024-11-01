@@ -4,11 +4,8 @@ import { useNavigate } from "react-router-dom";
 export const About = () => {
   const navigate = useNavigate();
 
-  const goToHomeAndActivateAccordion = async () => {
-    await new Promise((resolve) => {
-      localStorage.setItem("accordion-active", JSON.stringify(true));
-      resolve();
-    });
+  const goToHomeAndActivateAccordion = () => {
+    localStorage.setItem("accordion-active", JSON.stringify(true));
     navigate("/");
   };
 

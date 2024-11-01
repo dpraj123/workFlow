@@ -1,7 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Contact = () => {
+  const navigate = useNavigate();
+  const goToHomeAndActivateAccordion = () => {
+    localStorage.setItem("accordion-active", JSON.stringify(true));
+    navigate("/");
+  };
+
   return (
     <div className="container">
       <h2>
@@ -9,7 +15,18 @@ const Contact = () => {
         <nav
           style={{ display: "flex", flexDirection: "row", columnGap: "20px" }}
         >
-          <Link to="/">Home</Link>
+          <button
+            onClick={goToHomeAndActivateAccordion}
+            style={{
+              background: "none",
+              border: "none",
+              color: "blue",
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            Home
+          </button>
         </nav>
       </h2>
       Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum mollitia

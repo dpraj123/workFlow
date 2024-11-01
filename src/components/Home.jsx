@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import ChildDisplay from "./ChildDisplay";
 
 export const Home = () => {
   const [isActive, setIsActive] = useState(
     JSON.parse(localStorage.getItem("accordion-active")) || false
   );
   const handleAccordionClick = () => {
-    setIsActive((prev) => !prev).then();
+    setIsActive((prev) => !prev);
     localStorage.setItem("accordion-active", JSON.stringify(isActive));
   };
   useEffect(() => {
@@ -32,6 +33,7 @@ export const Home = () => {
           onClick={handleAccordionClick}
         />
       </div>
+      <ChildDisplay reverse={true} />
     </div>
   );
 };
