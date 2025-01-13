@@ -1,70 +1,210 @@
-# Getting Started with Create React App
+"use client";
+import { useState, useEffect } from "react";
+import {
+  format,
+  addMonths,
+  subMonths,
+  setDate,
+  getDaysInMonth,
+} from "date-fns";
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+// Generate a list of years
+const generateYears = (start: number, end: number) => {
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+};
 
-## Available Scripts
+// Generate a list of months
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
-In the project directory, you can run:
+// Generate a list of days for the selected month and year
+const generateDays = (month: number, year: number) => {
+  const daysInMonth = getDaysInMonth(new Date(year, month));
+  return Array.from({ length: daysInMonth }, (_, i) => i + 1);
+};
 
-### `npm start`
+export default function Home() {
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [days, setDays] = useState<number[]>([]);
+  const [years] = useState<number[]>(
+    generateYears(1990, new Date().getFullYear())
+  );
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+  useEffect(() => {
+    const month = currentDate.getMonth();
+    const year = currentDate.getFullYear();
+    setDays(generateDays(month, year));
+  }, [currentDate]);
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+  const handleScrollDay = (event: React.WheelEvent) => {
+    event.preventDefault();
+    const newDay =
+      event.deltaY < 0
+        ? Math.min(getDaysInMonth(currentDate), currentDate.getDate() + 1)
+        : Math.max(1, currentDate.getDate() - 1);
 
-### `npm test`
+    setCurrentDate(setDate(currentDate, newDay));
+  };
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+  const handleScrollMonth = (event: React.WheelEvent) => {
+    event.preventDefault();
+    const newMonth =
+      event.deltaY < 0
+        ? (currentDate.getMonth() + 1) % 12
+        : (currentDate.getMonth() - 1 + 12) % 12;
 
-### `npm run build`
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), newMonth, currentDate.getDate())
+    );
+  };
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+  const handleScrollYear = (event: React.WheelEvent) => {
+    event.preventDefault();
+    const newYear =
+      event.deltaY < 0
+        ? currentDate.getFullYear() + 1
+        : currentDate.getFullYear() - 1;
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    setCurrentDate(
+      new Date(newYear, currentDate.getMonth(), currentDate.getDate())
+    );
+  };
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        {/* Day Picker */}
+        <div
+          onWheel={handleScrollDay}
+          style={{
+            height: "50px",
+            width: "60px",
+            border: "1px solid #ccc",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: "10px",
+            cursor: "pointer",
+          }}
+        >
+          {currentDate.getDate()}
+        </div>
 
-### `npm run eject`
+        {/* Month Picker */}
+        <div
+          onWheel={handleScrollMonth}
+          style={{
+            height: "50px",
+            width: "100px",
+            border: "1px solid #ccc",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: "10px",
+            cursor: "pointer",
+          }}
+        >
+          {months[currentDate.getMonth()]}
+        </div>
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+        {/* Year Picker */}
+        <div
+          onWheel={handleScrollYear}
+          style={{
+            height: "50px",
+            width: "80px",
+            border: "1px solid #ccc",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            cursor: "pointer",
+          }}
+        >
+          {currentDate.getFullYear()}
+        </div>
+      </div>
+    </div>
+  );
+}
+"use client";
+import { useState, useEffect } from "react";
+import { format, addDays, subDays } from "date-fns";
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+// Custom range function to generate a list of dates
+const generateDateList = (baseDate: Date, numDays: number) => {
+  return Array.from({ length: numDays }, (_, i) => addDays(baseDate, i));
+};
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+export default function Home() {
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [dateList, setDateList] = useState<Date[]>([]);
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+  // Generate a list of 7 dates starting from the current date
+  useEffect(() => {
+    const dates = generateDateList(currentDate, 4);
+    setDateList(dates);
+  }, [currentDate]);
 
-## Learn More
+  const handleWheel = (event: React.WheelEvent) => {
+    event.preventDefault();
+    if (event.deltaY < 0) {
+      // Scroll up, show next set of dates
+      setCurrentDate((prev) => addDays(prev, 1));
+    } else {
+      // Scroll down, show previous set of dates
+      setCurrentDate((prev) => subDays(prev, 1));
+    }
+  };
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+  return (
+    <div
+      className="flex pt-10 !w-[100vw] justify-center"
+      onWheel={handleWheel}
+      style={{
+        overflowY: "auto",
+        border: "1px solid #ccc",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        {dateList.map((date) => (
+          <div
+            key={date.toString()}
+            style={{
+              padding: "10px",
+              borderBottom: "1px solid #eee",
+              textAlign: "center",
+              cursor: "pointer",
+            }}
+            onClick={() => setCurrentDate(date)}
+          >
+            {format(date, "dd MMM yyyy")}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
